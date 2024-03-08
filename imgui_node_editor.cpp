@@ -2753,6 +2753,15 @@ ed::NodeSettings* ed::Settings::FindNode(NodeId id)
     return nullptr;
 }
 
+const ed::NodeSettings* ed::Settings::FindNode(NodeId id) const
+{
+    for (auto& settings : m_Nodes)
+        if (settings.m_ID == id)
+            return &settings;
+
+    return nullptr;
+}
+
 void ed::Settings::RemoveNode(NodeId id)
 {
     auto node = FindNode(id);

@@ -546,6 +546,7 @@ struct Settings
 
     NodeSettings* AddNode(NodeId id);
     NodeSettings* FindNode(NodeId id);
+    const NodeSettings* FindNode(NodeId id) const;
     void RemoveNode(NodeId id);
 
     void ClearDirty(Node* node = nullptr);
@@ -1472,6 +1473,10 @@ struct EditorContext
     }
 
     ImDrawList* GetDrawList() { return m_DrawList; }
+
+    const Settings& GetSettings() const { return m_Settings; }
+    void SetViewScroll(ImVec2 scroll) { m_Settings.m_ViewScroll = scroll; }
+    void SetViewZoom(float zoom) { m_Settings.m_ViewZoom = zoom; }
 
 private:
     void LoadSettings();

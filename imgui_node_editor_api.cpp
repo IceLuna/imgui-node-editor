@@ -44,12 +44,12 @@ static int BuildIdList(C& container, I* list, int listSize, F&& accept)
 
 
 //------------------------------------------------------------------------------
-ax::NodeEditor::EditorContext* ax::NodeEditor::CreateEditor(const Config* config)
+ax::NodeEditor::Detail::EditorContext* ax::NodeEditor::CreateEditor(const Config* config)
 {
-    return reinterpret_cast<ax::NodeEditor::EditorContext*>(new ax::NodeEditor::Detail::EditorContext(config));
+    return reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(new ax::NodeEditor::Detail::EditorContext(config));
 }
 
-void ax::NodeEditor::DestroyEditor(EditorContext* ctx)
+void ax::NodeEditor::DestroyEditor(Detail::EditorContext* ctx)
 {
     auto lastContext = GetCurrentEditor();
 
@@ -65,7 +65,7 @@ void ax::NodeEditor::DestroyEditor(EditorContext* ctx)
         SetCurrentEditor(lastContext);
 }
 
-const ax::NodeEditor::Config& ax::NodeEditor::GetConfig(EditorContext* ctx)
+const ax::NodeEditor::Config& ax::NodeEditor::GetConfig(Detail::EditorContext* ctx)
 {
     if (ctx == nullptr)
         ctx = GetCurrentEditor();
@@ -83,14 +83,14 @@ const ax::NodeEditor::Config& ax::NodeEditor::GetConfig(EditorContext* ctx)
     }
 }
 
-void ax::NodeEditor::SetCurrentEditor(EditorContext* ctx)
+void ax::NodeEditor::SetCurrentEditor(Detail::EditorContext* ctx)
 {
     s_Editor = reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(ctx);
 }
 
-ax::NodeEditor::EditorContext* ax::NodeEditor::GetCurrentEditor()
+ax::NodeEditor::Detail::EditorContext* ax::NodeEditor::GetCurrentEditor()
 {
-    return reinterpret_cast<ax::NodeEditor::EditorContext*>(s_Editor);
+    return reinterpret_cast<ax::NodeEditor::Detail::EditorContext*>(s_Editor);
 }
 
 ax::NodeEditor::Style& ax::NodeEditor::GetStyle()

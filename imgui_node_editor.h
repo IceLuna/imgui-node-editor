@@ -35,6 +35,10 @@
 namespace ax {
 namespace NodeEditor {
 
+namespace Detail {
+//------------------------------------------------------------------------------
+struct EditorContext;
+}
 
 //------------------------------------------------------------------------------
 struct NodeId;
@@ -281,16 +285,14 @@ struct Style
 };
 
 
-//------------------------------------------------------------------------------
-struct EditorContext;
 
 
 //------------------------------------------------------------------------------
-IMGUI_NODE_EDITOR_API void SetCurrentEditor(EditorContext* ctx);
-IMGUI_NODE_EDITOR_API EditorContext* GetCurrentEditor();
-IMGUI_NODE_EDITOR_API EditorContext* CreateEditor(const Config* config = nullptr);
-IMGUI_NODE_EDITOR_API void DestroyEditor(EditorContext* ctx);
-IMGUI_NODE_EDITOR_API const Config& GetConfig(EditorContext* ctx = nullptr);
+IMGUI_NODE_EDITOR_API void SetCurrentEditor(Detail::EditorContext* ctx);
+IMGUI_NODE_EDITOR_API Detail::EditorContext* GetCurrentEditor();
+IMGUI_NODE_EDITOR_API Detail::EditorContext* CreateEditor(const Config* config = nullptr);
+IMGUI_NODE_EDITOR_API void DestroyEditor(Detail::EditorContext* ctx);
+IMGUI_NODE_EDITOR_API const Config& GetConfig(Detail::EditorContext* ctx = nullptr);
 
 IMGUI_NODE_EDITOR_API Style& GetStyle();
 IMGUI_NODE_EDITOR_API const char* GetStyleColorName(StyleColor colorIndex);
