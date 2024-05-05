@@ -150,6 +150,56 @@ bool ImGuiEx::Canvas::Begin(ImGuiID id, const ImVec2& size)
 
     m_InBeginEnd = true;
 
+    auto beginWindowHook = ImGuiContextHook{};
+    beginWindowHook.UserData = this;
+    beginWindowHook.Type = ImGuiContextHookType_BeginWindow;
+    beginWindowHook.Callback = [](ImGuiContext* context, ImGuiContextHook* hook)
+    {
+        //ImGui::SetNextWindowViewport( ImGui::GetCurrentWindow()->Viewport->ID );
+
+        auto canvas = reinterpret_cast<Canvas*>(hook->UserData);
+        if (canvas->m_SuspendCounter == 0)
+        {
+            if ((context->NextWindowData.Flags & ImGuiNextWindowDataFlags_HasPos) != 0)
+            {
+                auto pos = canvas->FromLocal(context->NextWindowData.PosVal);
+                ImGui::SetNextWindowPos(pos, context->NextWindowData.PosCond, context->NextWindowData.PosPivotVal);
+            }
+
+            if (context->BeginPopupStack.size())
+            {
+                auto& popup = context->BeginPopupStack.back();
+                popup.OpenPopupPos = canvas->FromLocal(popup.OpenPopupPos);
+                popup.OpenMousePos = canvas->FromLocal(popup.OpenMousePos);
+            }
+
+            if (context->OpenPopupStack.size())
+            {
+                auto& popup = context->OpenPopupStack.back();
+                popup.OpenPopupPos = canvas->FromLocal(popup.OpenPopupPos);
+                popup.OpenMousePos = canvas->FromLocal(popup.OpenMousePos);
+            }
+
+        }
+        canvas->m_BeginWindowCursorBackup = ImGui::GetCursorScreenPos();
+        canvas->Suspend();
+    };
+
+    m_beginWindowHook = ImGui::AddContextHook(ImGui::GetCurrentContext(), &beginWindowHook);
+
+    auto endWindowHook = ImGuiContextHook{};
+    endWindowHook.UserData = this;
+    endWindowHook.Type = ImGuiContextHookType_EndWindow;
+    endWindowHook.Callback = [](ImGuiContext* ctx, ImGuiContextHook* hook)
+        {
+            auto canvas = reinterpret_cast<Canvas*>(hook->UserData);
+            canvas->Resume();
+            ImGui::SetCursorScreenPos(canvas->m_BeginWindowCursorBackup);
+            ImGui::GetCurrentWindow()->DC.IsSetPos = false;
+        };
+
+    m_endWindowHook = ImGui::AddContextHook(ImGui::GetCurrentContext(), &endWindowHook);
+
     return true;
 }
 
@@ -185,6 +235,9 @@ void ImGuiEx::Canvas::End()
     //m_DrawList->AddRect(m_WidgetPosition - ImVec2(1.0f, 1.0f), m_WidgetPosition + m_WidgetSize + ImVec2(1.0f, 1.0f), IM_COL32(196, 0, 0, 255));
 
     m_InBeginEnd = false;
+
+    ImGui::RemoveContextHook(ImGui::GetCurrentContext(), m_beginWindowHook);
+    ImGui::RemoveContextHook(ImGui::GetCurrentContext(), m_endWindowHook);
 }
 
 void ImGuiEx::Canvas::SetView(const ImVec2& origin, float scale)
@@ -561,6 +614,23 @@ void ImGuiEx::Canvas::LeaveLocalSpace()
             m_DrawList->CmdBuffer.erase(m_DrawList->CmdBuffer.Data + m_DrawListCommadBufferSize);
         else if (m_DrawList->CmdBuffer.size() >= m_DrawListCommadBufferSize && m_DrawList->CmdBuffer[m_DrawListCommadBufferSize - 1].UserCallback == ImDrawCallback_ImCanvas)
             m_DrawList->CmdBuffer.erase(m_DrawList->CmdBuffer.Data + m_DrawListCommadBufferSize - 1);
+
+        // Proposed solution from (https://github.com/thedmd/imgui-node-editor/pull/285):
+        // test all commands from index >= m_DrawListFirstCommandIndex
+        // and remove the one with UserCallback == ImDrawCallback_ImCanvas
+        // (based on the original code, it seems there can be only one)
+        int idxCommand_ImDrawCallback_ImCanvas = -1;
+        for (int i = m_DrawListFirstCommandIndex; i < m_DrawList->CmdBuffer.size(); ++i)
+        {
+            auto& command = m_DrawList->CmdBuffer[i];
+            if (command.UserCallback == ImDrawCallback_ImCanvas)
+            {
+                idxCommand_ImDrawCallback_ImCanvas = i;
+                break;
+            }
+        }
+        if (idxCommand_ImDrawCallback_ImCanvas >= 0)
+            m_DrawList->CmdBuffer.erase(m_DrawList->CmdBuffer.Data + idxCommand_ImDrawCallback_ImCanvas);
     }
 
     auto& fringeScale = ImFringeScaleRef(m_DrawList);

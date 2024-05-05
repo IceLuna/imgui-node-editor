@@ -224,6 +224,9 @@ private:
 
     bool m_InBeginEnd = false;
 
+    ImGuiID m_beginWindowHook{};
+    ImGuiID m_endWindowHook{};
+
     ImVec2 m_WidgetPosition;
     ImVec2 m_WidgetSize;
     ImRect m_WidgetRect;
@@ -253,6 +256,7 @@ private:
     ImVec2 m_MousePosPrevBackup;
     ImVec2 m_MouseClickedPosBackup[IM_ARRAYSIZE(ImGuiIO::MouseClickedPos)];
     ImVec2 m_WindowCursorMaxBackup;
+    ImVec2 m_BeginWindowCursorBackup;
 
 # if defined(IMGUI_HAS_VIEWPORT)
     ImVec2 m_WindowPosBackup;
