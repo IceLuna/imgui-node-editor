@@ -16,7 +16,7 @@
 namespace ed   = ax::NodeEditor;
 namespace util = ax::NodeEditor::Utilities;
 
-util::BlueprintNodeBuilder::BlueprintNodeBuilder(ImTextureID texture, int textureWidth, int textureHeight):
+util::BlueprintNodeBuilder::BlueprintNodeBuilder(ImTextureRef texture, int textureWidth, int textureHeight):
     HeaderTextureId(texture),
     HeaderTextureWidth(textureWidth),
     HeaderTextureHeight(textureHeight),
@@ -56,7 +56,7 @@ void util::BlueprintNodeBuilder::End()
         const auto halfBorderWidth = ed::GetStyle().NodeBorderWidth * 0.5f;
 
         auto headerColor = IM_COL32(0, 0, 0, alpha) | (HeaderColor & IM_COL32(255, 255, 255, 0));
-        if ((HeaderMax.x > HeaderMin.x) && (HeaderMax.y > HeaderMin.y) && HeaderTextureId)
+        if ((HeaderMax.x > HeaderMin.x) && (HeaderMax.y > HeaderMin.y) && HeaderTextureId.GetTexID())
         {
             const auto uv = ImVec2(
                 (HeaderMax.x - HeaderMin.x) / (float)(4.0f * HeaderTextureWidth),

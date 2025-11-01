@@ -23,7 +23,7 @@ namespace Utilities {
 //------------------------------------------------------------------------------
 struct BlueprintNodeBuilder
 {
-    BlueprintNodeBuilder(ImTextureID texture = nullptr, int textureWidth = 0, int textureHeight = 0);
+    BlueprintNodeBuilder(ImTextureRef texture = nullptr, int textureWidth = 0, int textureHeight = 0);
 
     void Begin(NodeId id);
     void End();
@@ -58,7 +58,7 @@ private:
     void Pin(PinId id, ax::NodeEditor::PinKind kind);
     void EndPin();
 
-    ImTextureID HeaderTextureId;
+    ImTextureRef HeaderTextureId;
     int         HeaderTextureWidth;
     int         HeaderTextureHeight;
     NodeId      CurrentNodeId;
