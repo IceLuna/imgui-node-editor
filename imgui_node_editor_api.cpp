@@ -387,6 +387,12 @@ void ax::NodeEditor::EndDelete()
     context.End();
 }
 
+bool ax::NodeEditor::HasNode(NodeId nodeId)
+{
+    auto node = s_Editor->FindNode(nodeId);
+    return node != nullptr;
+}
+
 void ax::NodeEditor::SetNodePosition(NodeId nodeId, const ImVec2& position)
 {
     s_Editor->SetNodePosition(nodeId, position);
